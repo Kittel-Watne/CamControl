@@ -23,9 +23,13 @@ ACameraSwitcher::ACameraSwitcher()
     CameraTwo = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraTwo"));
     CameraTwo->SetupAttachment(RootComponent);
 
+    CameraThree = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraThree"));
+    CameraThree->SetupAttachment(RootComponent);
+
     // Make CameraOne the active camera at start
     CameraOne->SetActive(true);
     CameraTwo->SetActive(false);
+    CameraThree->SetActive(false);
 }
 
 // Called when the game starts or when spawned
@@ -40,7 +44,7 @@ void ACameraSwitcher::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
     APlayerController* MyPlayerController = UGameplayStatics::GetPlayerController(this, 0);
-    if (MyPlayerController->IsInputKeyDown(EKeys::C))
+    if (MyPlayerController->WasInputKeyJustPressed(EKeys::C))
         SwitchCamera();
 
 }
@@ -62,9 +66,16 @@ void ACameraSwitcher::SwitchCamera()
             // Set the view target to CameraTwo
             PlayerController->SetViewTarget(this);
         }
-        else
+        else if (CameraTwo->IsActive())
         {
             CameraTwo->Deactivate();
+            CameraThree->Activate();
+
+            PlayerController->SetViewTarget(this);
+        }
+        else
+        {
+            CameraThree->Deactivate();
             CameraOne->Activate();
 
             // Set the view target to CameraOne
